@@ -1,5 +1,6 @@
 import TADs.Hash.*;
 import TADs.Heap.*;
+import TADs.Lista.*;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -88,9 +89,17 @@ public class CSVReader {
                 heapPilotos.insert(piloto,contadorPilotos.get(piloto));
             }
 
-            heapPilotos.preOrder().imprimir();
-            heapPilotos.inOrder().imprimir();
-            heapPilotos.postOrder().imprimir();
+
+            LL<String> pilotosOrdenados = new LL<>();
+
+// Extrae los pilotos del montón hasta que esté vacío
+            while (!heapPilotos.isEmpty()) {
+//                pilotosOrdenados.add(heapPilotos.delete());
+            }
+
+//            heapPilotos.preOrder().imprimir();
+//            heapPilotos.inOrder().imprimir();
+//            heapPilotos.postOrder().imprimir();
 
         }catch (IOException e) {
             e.printStackTrace();

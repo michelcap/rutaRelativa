@@ -1,7 +1,6 @@
 package TADs.Heap;
 
 import TADs.BST.LL.LL;
-import TADs.BST.NodeBST;
 import TADs.Queue.Queue;
 
 public class Heap<K extends Comparable<K>, V> implements MyHeap<K, V> {
@@ -229,6 +228,11 @@ public class Heap<K extends Comparable<K>, V> implements MyHeap<K, V> {
         sb.append("]");
         return sb.toString();
     }
+
+    public boolean isEmpty() {
+        return root == null;
+    }
+
 
     public LL<K> inOrder() {
         return inOrder(root);
