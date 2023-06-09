@@ -1,5 +1,10 @@
 package TADs.Hash;
 
+import Entidades.User;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class LinearProbingHashTable<K, V> implements HashTable<K, V> {
     private Entry<K, V>[] table;
     private static final int START_CAPACITY = 10;
@@ -11,8 +16,25 @@ public class LinearProbingHashTable<K, V> implements HashTable<K, V> {
         table = new Entry[START_CAPACITY];
     }
 
+    public List<Entry<K, V>> getEntries() {
+        List<Entry<K, V>> entries = new ArrayList<>();
+        for (Entry<K, V> entry : table) {
+            if (entry != null) {
+                entries.add(entry);
+            }
+        }
+        return entries;
+    }
+
+
     private int hash(K key) {
-        String keyString = (String) key;
+        String keyString;
+        if (key instanceof User) {
+            keyString = ((User) key).getName(); // Reemplaza 'getName()' con el método correcto si es necesario
+        } else {
+            keyString = key.toString();
+        }
+
         int hashValue = 0;
         int prime = 7;
 
@@ -22,6 +44,24 @@ public class LinearProbingHashTable<K, V> implements HashTable<K, V> {
 
         return Math.abs(hashValue % table.length);
     }
+
+    public K getUser(K key) {
+        int index = hash(key);
+
+        while (table[index] != null) {
+            if (table[index].key.equals(key)) {
+                return table[index].key;
+            }
+            index++;
+            if (index >= table.length) {
+                index = 0;
+            }
+        }
+        return null;  // Retorna null si el usuario no se encuentra.
+    }
+
+
+
 
 
 
@@ -151,3 +191,4 @@ public class LinearProbingHashTable<K, V> implements HashTable<K, V> {
 
 
 }
+

@@ -1,10 +1,12 @@
 import TADs.Hash.*;
-import TADs.Heap.*;
 import TADs.Lista.*;
+
+import Entidades.*;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.IOException;
@@ -16,19 +18,19 @@ public class CSVReader {
             Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
-                String user_name = record.get("user_name");
-                String user_location = record.get("user_location");
-                String user_description = record.get("user_description");
-                String user_created = record.get("user_created");
-                String user_followers = record.get("user_followers");
-                String user_friends = record.get("user_friends");
-                String user_favourites = record.get("user_favourites");
-                String user_verified = record.get("user_verified");
-                String date = record.get("date");
-                String text = record.get("text");
-                String hashtags = record.get("hashtags");
-                String source = record.get("source");
-                String is_retweet = record.get("is_retweet");
+//                String user_name = record.get("user_name");
+//                String user_location = record.get("user_location");
+//                String user_description = record.get("user_description");
+//                String user_created = record.get("user_created");
+//                String user_followers = record.get("user_followers");
+//                String user_friends = record.get("user_friends");
+//                String user_favourites = record.get("user_favourites");
+//                String user_verified = record.get("user_verified");
+//                String date = record.get("date");
+//                String text = record.get("text");
+//                String hashtags = record.get("hashtags");
+//                String source = record.get("source");
+//                String is_retweet = record.get("is_retweet");
 
             }
         } catch (IOException e) {
@@ -36,7 +38,11 @@ public class CSVReader {
         }
 
     }
+
+
+    // ----------  ----------  Primer funcion ----------  ----------
     public static void topPilotos(int mesInput, int anoInput){
+
         // Crear tu tabla hash para llevar la cuenta de las menciones de cada piloto
         LinearProbingHashTable<String, Integer> contadorPilotos = new LinearProbingHashTable<>();
 
@@ -74,6 +80,7 @@ public class CSVReader {
 
                 // Comprueba cada piloto
                 for (String piloto : pilotos) {
+
                     if (text.contains(piloto) && anoInt == anoInput && mesInt == mesInput){
                         // Incrementa el contador para este piloto
                         contadorPilotos.put(piloto, contadorPilotos.get(piloto) + 1);
@@ -81,29 +88,76 @@ public class CSVReader {
                 }
             }
 
-            Heap<String,Integer> heapPilotos = new Heap<>();
+            LL<Piloto> pilotosOrdenados = new LL<>();
 
-            // Imprimir los contadores
+
+// Imprimir los contadores
             for (String piloto : pilotos) {
-                System.out.println(piloto + ": " + contadorPilotos.get(piloto));
-                heapPilotos.insert(piloto,contadorPilotos.get(piloto));
+//                System.out.println(piloto + ": " + contadorPilotos.get(piloto));
+                int contPiloto = contadorPilotos.get(piloto);
+                Piloto tempPiloto = new Piloto(piloto,contPiloto);
+                pilotosOrdenados.add(tempPiloto);
+            }
+
+            pilotosOrdenados.sort();
+
+            for (int i = 0; i < 10; i++) {
+                System.out.println( i+1 +"." +pilotosOrdenados.get(i));
             }
 
 
-            LL<String> pilotosOrdenados = new LL<>();
-
-// Extrae los pilotos del montón hasta que esté vacío
-            while (!heapPilotos.isEmpty()) {
-//                pilotosOrdenados.add(heapPilotos.delete());
-            }
-
-//            heapPilotos.preOrder().imprimir();
-//            heapPilotos.inOrder().imprimir();
-//            heapPilotos.postOrder().imprimir();
 
         }catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+
+    // ----------  ----------  Segunda funcion ----------  ----------
+    public static void topUsuariosTweets() {
+        try {
+            Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
+            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+
+
+            LinearProbingHashTable<User, Integer> usuariosReg = new LinearProbingHashTable<>();
+
+            for (CSVRecord record : records) {
+                //recorro cada tupla y obtengo las datos q necesito
+                String column = record.get("");
+                int column1 = Integer.parseInt(column); // id del tweet
+
+                String user_name = record.get("user_name"); //nombre
+
+                //creo el usuario y el tweet temporal
+                User tempUsuario = new User(column1,user_name);
+//                Tweet tempTweet = new Tweet(column1);
+
+
+                if (!usuariosReg.contains(tempUsuario)){
+                    usuariosReg.put(tempUsuario,1);
+                }else {
+                    usuariosReg.put(tempUsuario, usuariosReg.get(tempUsuario) + 1);
+                }
+
+
+                for (Entry<User, Integer> entry : usuariosReg.getEntries()) {
+                    User user = entry.getKey();
+                    int tweets = entry.getValue();
+                    System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " );
+                }
+
+
+
+            }
+
+
+
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

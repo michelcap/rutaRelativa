@@ -170,6 +170,20 @@ public class LL<T extends  Comparable<T>> implements Lista<T>{
         }
     }
 
+    public boolean contains(T value) {
+        NodeLinkedList<T> current = head;
+
+        while (current != null) {
+            if (current.value.equals(value)) {
+                return true;
+            }
+            current = current.next;
+        }
+
+        return false;
+    }
+
+
 
     @Override
     public void imprimir() {
@@ -183,48 +197,50 @@ public class LL<T extends  Comparable<T>> implements Lista<T>{
         System.out.println(temporaryNodeLinkedList.value);
     }
 
-    // -----  ------  -----  ------  -----  ------  -----  ------  -----  ------  -----  ------
-    //aca arranca el main
-    public static void main(String[] args) {
-        LL<Integer> listita = new LL<>();
+    public void sort() {
+        if (size() < 2) {
+            return;
+        }
 
+        boolean swapped;
+        do {
+            NodeLinkedList<T> current = head;
+            NodeLinkedList<T> previous = null;
+            NodeLinkedList<T> next = head.next;
+            swapped = false;
 
+            while (next != null) {
+                // Cambiamos la condición de la comparación aquí
+                if (current.value.compareTo(next.value) < 0) {
+                    swapped = true;
 
-        //pruebo lo de añadir
-        listita.add(1);
-        listita.add(2);
-        listita.add(3);
-        listita.add(4);
+                    if (previous != null) {
+                        NodeLinkedList<T> sig = next.next;
 
-        listita.imprimir();
+                        // Realizamos el intercambio
+                        previous.next = next;
+                        next.next = current;
+                        current.next = sig;
+                    } else {
+                        NodeLinkedList<T> sig = next.next;
 
-        //pruebo el remove
-        listita.remove(1);
+                        // Intercambiamos head, lo cual es necesario si el primer elemento es el menor
+                        head = next;
+                        next.next = current;
+                        current.next = sig;
+                    }
 
-        //pruebo el get
-        System.out.println("aver si esto funciona");
-        System.out.println(listita.get(2));
-
-        //pruebo el addFirst
-        listita.addFirst(7);
-        System.out.println();
-
-        //pruebo el addAt
-        listita.addAt(0, 0);
-        System.out.println();
-        listita.imprimir();
-        //pruebo el esta
-        listita.find(0);
-        listita.find(7);
-        listita.find(4);
-        listita.find(45);
-
-
-        // -----  ------  -----  ------  -----  ------  -----  ------  -----  ------  -----  ------
-        // voy a intentar lo de insertar ordenadamente
-
-
+                    previous = next;
+                    next = current.next;
+                } else {
+                    previous = current;
+                    current = next;
+                    next = next.next;
+                }
+            }
+        } while (swapped);
     }
+
 }
 
 
