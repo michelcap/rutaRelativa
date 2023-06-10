@@ -6,10 +6,15 @@ import Entidades.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import javax.persistence.criteria.CriteriaBuilder;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
 import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CSVReader {
 
@@ -46,8 +51,24 @@ public class CSVReader {
         // Crear tu tabla hash para llevar la cuenta de las menciones de cada piloto
         LinearProbingHashTable<String, Integer> contadorPilotos = new LinearProbingHashTable<>();
 
-        String[] pilotos = {"Verstappen", "Pérez", "Leclerc", "Sainz", "Hamilton", "Russell", "Alonso", "Stroll", "Norris",
-                "Piastri", "Gasly", "Ocon", "Vries", "Tsunoda", "Albon", "Sargeant", "Zhou", "Bottas", "Hülkenberg", "Magnussen"};
+        String archivo = "/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/drivers.txt";
+        List<String> listaPilotos = new ArrayList<>();
+
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(archivo))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                listaPilotos.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Convierte la lista de pilotos a un array
+        String[] pilotos = listaPilotos.toArray(new String[0]);
+
+
+
+//        String[] pilotos = {"Verstappen", "Pérez", "Leclerc", "Sainz", "Hamilton", "Russell", "Alonso", "Stroll", "Norris",
+//                "Piastri", "Gasly", "Ocon", "Vries", "Tsunoda", "Albon", "Sargeant", "Zhou", "Bottas", "Hülkenberg", "Magnussen"};
 
         // Inicializar los contadores de todos los pilotos a 0
         for (String piloto : pilotos) {
@@ -81,7 +102,11 @@ public class CSVReader {
                 // Comprueba cada piloto
                 for (String piloto : pilotos) {
 
-                    if (text.contains(piloto) && anoInt == anoInput && mesInt == mesInput){
+                    String[] partesPiloto = piloto.split(" ");
+                    String nombrePiloto = partesPiloto[0];
+                    String apePiloto = partesPiloto[1];
+
+                    if (text.contains(nombrePiloto) || text.contains(apePiloto) && anoInt == anoInput && mesInt == mesInput){
                         // Incrementa el contador para este piloto
                         contadorPilotos.put(piloto, contadorPilotos.get(piloto) + 1);
                     }
