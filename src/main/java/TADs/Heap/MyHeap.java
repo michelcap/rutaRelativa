@@ -1,14 +1,13 @@
 package TADs.Heap;
 
-public interface MyHeap<K extends Comparable<K>, V> {
+import TADs.Heap.*;
 
-    V find(K key);
+public interface MyHeap<K,T> {
+    void insert(K key, T data) throws Exception;
 
-    void insert(K key, V value);
-    void delete(); //elimina siempre la raiz
+    NodoTreeBin<K,T> delete();
 
-    void delete(K key); //elimina con key
+    int size();
 
     String toString();
-
 }

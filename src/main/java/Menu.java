@@ -36,7 +36,7 @@ public class Menu {
                     break;
                 case 2:
                     // la función para mostrar el top de usuarios con más tweets
-                    CSVReader.topUsuariosTweets();
+                    //CSVReader.topUsuariosTweets();
                     break;
                 case 3:
                     System.out.println("Ingrese la fecha (en formato YYYY-MM-DD):");
@@ -51,7 +51,8 @@ public class Menu {
                     CSVReader.hashtagMasUsado(fechaHash);
                     break;
                 case 5:
-                    // la función para mostrar las top cuentas con más favoritos
+                    // la función para mostrar las top 7 cuentas con más favoritos
+                    CSVReader.topSiteCuentas();
                     break;
                 case 6:
                     System.out.println("Ingrese la palabra o frase a buscar:");

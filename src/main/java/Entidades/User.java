@@ -11,20 +11,17 @@ public class User implements Comparable<User> {
         return listaTweets;
     }
 
-
     private long id;
 
     private String name;
 
     private String verificado;
 
+    private String favoritos;
+
 
     public long getId() {
         return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getVerificado() {
@@ -35,18 +32,19 @@ public class User implements Comparable<User> {
         return name;
     }
 
-    public void setName(String name) {
+    public String getFavoritos() {
+        return favoritos;
+    }
+
+    public User(String name, String favoritos, String verificado) {
         this.name = name;
+        this.verificado = verificado;
+        this.favoritos = favoritos;
     }
 
     @Override
     public int compareTo(User o) {
-        return this.name.compareTo(o.name);
-    }
-
-    public User(String text, String verificado) {
-        this.name = text;
-        this.verificado = verificado;
+        return this.name.compareTo(o.getName());
     }
 
     @Override
@@ -56,6 +54,4 @@ public class User implements Comparable<User> {
         User user = (User) o;
         return name.equals(user.name);
     }
-
-
 }
