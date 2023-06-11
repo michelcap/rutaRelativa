@@ -42,11 +42,13 @@ public class Menu {
                     System.out.println("Ingrese la fecha (en formato YYYY-MM-DD):");
                     String fecha = scanner.next();
                     // la función para mostrar la cantidad de hashtags distintos
+                    CSVReader.hashtagDistintos(fecha);
                     break;
                 case 4:
                     System.out.println("Ingrese la fecha (en formato YYYY-MM-DD):");
                     String fechaHash = scanner.next();
                     // la función para mostrar el hashtag más usado
+                    CSVReader.hashtagMasUsado(fechaHash);
                     break;
                 case 5:
                     // la función para mostrar las top cuentas con más favoritos
