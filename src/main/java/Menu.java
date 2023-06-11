@@ -58,6 +58,7 @@ public class Menu {
                     System.out.println("Ingrese la palabra o frase a buscar:");
                     String busqueda = scanner.next();
                     // la función para contar tweets con una frase específica
+                    CSVReader.tweetsFrase(busqueda);
                     break;
                 case 7:
                     System.out.println("Hasta luego!");

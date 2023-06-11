@@ -279,30 +279,30 @@ public class CSVReader {
                 for (String parteHashtag : hashtagsParts) {
                     String parteHashSinCorcheteIzq = parteHashtag.replace("[", "");
                     String parteHashSinCorcheteDer = parteHashSinCorcheteIzq.replace("]", "");
-
-
                     HashTag hashTagIndividual = new HashTag(parteHashSinCorcheteDer);
-
                     if (!hashTagsReg.contains(hashTagIndividual) && date.contains(fecha)) { //en el caso que no este registrado
                         hashTagsReg.put(hashTagIndividual, 1);
                     } else if (hashTagsReg.contains(hashTagIndividual) && date.contains(fecha)) { //en el caso q ya este registrado
                         hashTagsReg.put(hashTagIndividual, hashTagsReg.get(hashTagIndividual) + 1);
                     }
-
                 }
-
             }
 
             int contHashtags = 0;
-            String hashtag = "";
+            String hashtag = " ";
 
             for (Entry<HashTag, Integer> entry : hashTagsReg.getEntries()) {
                 if (entry.getValue() > contHashtags && !Objects.equals(entry.getKey().getText(), "f1")) {
                     hashtag = entry.getKey().getText();
                 }
             }
+            if (!hashtag.equals(" ")) {
+                System.out.println("Hashtags más usado el " + fecha + ": " + hashtag);
+            } else {
+                System.out.println("No hay Hashtags para el día " + fecha);
+            }
 
-            System.out.println("Hashtags más usado el " + fecha + ": " + hashtag);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -353,6 +353,29 @@ public class CSVReader {
             e.printStackTrace();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // ----------  ----------  Sexta funcion ----------  ---------- *Michel*
+    public static void tweetsFrase(String frase) {
+        try {
+            Reader in = new FileReader(DATA_SET);
+            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+            int count = 0;
+            for (CSVRecord record : records) {
+                String tweets = record.get("text");
+                if (tweets.contains(frase)) {
+                    count++;
+                }
+            }
+            if (count != 0) {
+                System.out.println("Existen " + count + " tweets con la frase/palabra " + "'" +frase+ "'");
+            } else {
+                System.out.println("No hay tweets con la frase/palabra " + frase);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
