@@ -16,6 +16,8 @@ public class User implements Comparable<User> {
 
     private String name;
 
+    private String verificado;
+
 
     public long getId() {
         return id;
@@ -23,6 +25,10 @@ public class User implements Comparable<User> {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getVerificado() {
+        return verificado;
     }
 
     public String getName() {
@@ -35,12 +41,12 @@ public class User implements Comparable<User> {
 
     @Override
     public int compareTo(User o) {
-        return 0;
+        return this.name.compareTo(o.name);
     }
 
-    public User(long id, String text) {
-        this.id = id;
+    public User(String text, String verificado) {
         this.name = text;
+        this.verificado = verificado;
     }
 
     @Override
@@ -48,7 +54,7 @@ public class User implements Comparable<User> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return id == user.id;
+        return name.equals(user.name);
     }
 
 

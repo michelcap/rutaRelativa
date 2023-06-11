@@ -5,6 +5,7 @@ import Entidades.*;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -48,6 +49,7 @@ public class CSVReader {
     // ----------  ----------  Primer funcion ----------  ----------
     public static void topPilotos(int mesInput, int anoInput){
 
+        // ----------  ----------  esto es para leer los pilotos del .txt  ----------  ----------
         // Crear tu tabla hash para llevar la cuenta de las menciones de cada piloto
         LinearProbingHashTable<String, Integer> contadorPilotos = new LinearProbingHashTable<>();
 
@@ -66,10 +68,6 @@ public class CSVReader {
         String[] pilotos = listaPilotos.toArray(new String[0]);
 
 
-
-//        String[] pilotos = {"Verstappen", "Pérez", "Leclerc", "Sainz", "Hamilton", "Russell", "Alonso", "Stroll", "Norris",
-//                "Piastri", "Gasly", "Ocon", "Vries", "Tsunoda", "Albon", "Sargeant", "Zhou", "Bottas", "Hülkenberg", "Magnussen"};
-
         // Inicializar los contadores de todos los pilotos a 0
         for (String piloto : pilotos) {
             contadorPilotos.put(piloto, 0);
@@ -78,8 +76,14 @@ public class CSVReader {
         try {
             Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+            int contadorTweets = 0;
+            int conRecord = 0;
 
             for (CSVRecord record : records){
+
+                conRecord ++;
+
+
                 //recorro cada tupla
                 String text = record.get("text");
                 String date = record.get("date");
@@ -99,6 +103,8 @@ public class CSVReader {
                 int anoInt = Integer.parseInt(ano);
                 int mesInt = Integer.parseInt(mes);
 
+                if (anoInt == anoInput && mesInt == mesInput) contadorTweets ++;
+
                 // Comprueba cada piloto
                 for (String piloto : pilotos) {
 
@@ -106,12 +112,16 @@ public class CSVReader {
                     String nombrePiloto = partesPiloto[0];
                     String apePiloto = partesPiloto[1];
 
+
                     if (text.contains(nombrePiloto) || text.contains(apePiloto) && anoInt == anoInput && mesInt == mesInput){
                         // Incrementa el contador para este piloto
                         contadorPilotos.put(piloto, contadorPilotos.get(piloto) + 1);
                     }
                 }
+
             }
+            System.out.println("tweets en ese mes: "+contadorTweets);
+            System.out.println("tuplas leidas: "+conRecord);
 
             LL<Piloto> pilotosOrdenados = new LL<>();
 
@@ -131,7 +141,6 @@ public class CSVReader {
             }
 
 
-
         }catch (IOException e) {
             e.printStackTrace();
         }
@@ -143,38 +152,44 @@ public class CSVReader {
         try {
             Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
-
+            int contUsuarios = 0;
 
             LinearProbingHashTable<User, Integer> usuariosReg = new LinearProbingHashTable<>();
 
             for (CSVRecord record : records) {
                 //recorro cada tupla y obtengo las datos q necesito
+
                 String column = record.get("");
                 int column1 = Integer.parseInt(column); // id del tweet
 
                 String user_name = record.get("user_name"); //nombre
 
+                String user_verified = record.get("user_verified");
+
+
+
+
                 //creo el usuario y el tweet temporal
-                User tempUsuario = new User(column1,user_name);
+                User tempUsuario = new User(user_name,user_verified);
 //                Tweet tempTweet = new Tweet(column1);
 
 
                 if (!usuariosReg.contains(tempUsuario)){
                     usuariosReg.put(tempUsuario,1);
+                    contUsuarios++;
                 }else {
                     usuariosReg.put(tempUsuario, usuariosReg.get(tempUsuario) + 1);
                 }
 
 
-                for (Entry<User, Integer> entry : usuariosReg.getEntries()) {
-                    User user = entry.getKey();
-                    int tweets = entry.getValue();
-                    System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " );
-                }
-
-
-
             }
+            for (Entry<User, Integer> entry : usuariosReg.getEntries()) {
+                User user = entry.getKey();
+                int tweets = entry.getValue();
+
+                System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " + user.getVerificado() );
+            }
+            System.out.println("cantidad de usuarios: "+contUsuarios);
 
 
 
