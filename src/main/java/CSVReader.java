@@ -8,6 +8,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 
+import java.awt.Menu;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.Reader;
@@ -19,10 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CSVReader {
+    static FileManager fileManager = new FileManager();
+
+    private static String DATA_SET = fileManager.getFilePath_DataSet();
+    private static String DRIVERS = fileManager.getFilePath_Drivers();
 
     public static void leerCSV(String[] args) {
         try {
-            Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
+            Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
 //                String user_name = record.get("user_name");
@@ -54,7 +59,7 @@ public class CSVReader {
         // Crear tu tabla hash para llevar la cuenta de las menciones de cada piloto
         LinearProbingHashTable<String, Integer> contadorPilotos = new LinearProbingHashTable<>();
 
-        String archivo = "/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/drivers.txt";
+        String archivo = DRIVERS;
         List<String> listaPilotos = new ArrayList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(Paths.get(archivo))) {
@@ -75,7 +80,7 @@ public class CSVReader {
         }
 
         try {
-            Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
+            Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             int contadorTweets = 0;
             int conRecord = 0;
@@ -151,7 +156,7 @@ public class CSVReader {
     // ----------  ----------  Segunda funcion ----------  ----------
     public static void topUsuariosTweets() {
         try {
-            Reader in = new FileReader("/Users/coru/IdeaProjects/AAObligatorio/src/main/resources/f1_dataset_test.csv");
+            Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             int contUsuarios = 0;
 
