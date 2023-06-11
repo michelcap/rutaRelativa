@@ -1,7 +1,10 @@
 package TADs.Heap;
 
-import TADs.BST.LL.LL;
+import TADs.Lista.*;
 import TADs.Queue.Queue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Heap<K extends Comparable<K>, V> implements MyHeap<K, V> {
 
@@ -285,7 +288,73 @@ public class Heap<K extends Comparable<K>, V> implements MyHeap<K, V> {
         return arbolPreOrder;
     }
 
+    // -----------------------------------------------------------------
 
+    public List<HeapNode<K, V>> toList() {
+        List<HeapNode<K, V>> nodeList = new ArrayList<>();
+
+        if (root == null)
+            return nodeList;
+
+        Queue<HeapNode<K, V>> queue = new Queue<>();
+        queue.enqueue(root);
+
+        while (!queue.isEmpty()) {
+            HeapNode<K, V> currentNode = queue.dequeue();
+            nodeList.add(currentNode);
+
+            if (currentNode.leftChild != null)
+                queue.enqueue(currentNode.leftChild);
+            if (currentNode.rightChild != null)
+                queue.enqueue(currentNode.rightChild);
+        }
+        return nodeList;
+    }
+
+    public void heapSort() {
+        List<HeapNode<K, V>> nodeList = toList();
+        int n = nodeList.size();
+
+        // Construir heap (reordenar el array)
+        for (int i = n / 2 - 1; i >= 0; i--)
+            maxHeapify(nodeList, n, i);
+
+        // Extraer elemento uno por uno del heap
+        for (int i = n - 1; i >= 0; i--) {
+            // Mover la raíz actual al inicio
+            HeapNode<K, V> temp = nodeList.get(i);
+            nodeList.set(i, nodeList.get(0));
+            nodeList.set(0, temp);
+
+            // Llamar maxHeapify en el heap reducido
+            maxHeapify(nodeList, i, 0);
+        }
+    }
+
+
+    private void maxHeapify(List<HeapNode<K, V>> nodeList, int n, int i) {
+        int largest = i; // Inicializar el más grande como raíz
+        int l = 2 * i + 1; // left = 2xi + 1
+        int r = 2 * i + 2; // right = 2xi + 2
+
+        // Si el hijo izquierdo es más grande que la raíz
+        if (l < n && nodeList.get(l).key.compareTo(nodeList.get(largest).key) > 0)
+            largest = l;
+
+        // Si el hijo derecho es más grande que el más grande hasta ahora
+        if (r < n && nodeList.get(r).key.compareTo(nodeList.get(largest).key) > 0)
+            largest = r;
+
+        // Si el más grande no es la raíz
+        if (largest != i) {
+            HeapNode<K, V> swap = nodeList.get(i);
+            nodeList.set(i, nodeList.get(largest));
+            nodeList.set(largest, swap);
+
+            // Recursivamente heapify  subárbol afectado
+            maxHeapify(nodeList, n, largest);
+        }
+    }
 
 
 }

@@ -1,4 +1,5 @@
 import TADs.Hash.*;
+import TADs.Heap.Heap;
 import TADs.Lista.*;
 
 import Entidades.*;
@@ -183,13 +184,27 @@ public class CSVReader {
 
 
             }
+
+            Heap<User, Integer> heapPrueba = new Heap<>();
+
             for (Entry<User, Integer> entry : usuariosReg.getEntries()) {
                 User user = entry.getKey();
                 int tweets = entry.getValue();
+                heapPrueba.insert(user,tweets);
 
-                System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " + user.getVerificado() );
+//                System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " + user.getVerificado() );
             }
-            System.out.println("cantidad de usuarios: "+contUsuarios);
+
+
+
+            heapPrueba.heapSort();
+            LL<User> aver = heapPrueba.inOrder();
+
+
+            for (int i = 0; i < 15; i++) {   //el coso esta al reves!!!!!
+                System.out.println(i +1 +"." + aver.get(i).getName() + "Cantidad de Tweets: " + heapPrueba.find(aver.get(i)) + " verificado: " + aver.get(i).getVerificado());
+            }
+//            System.out.println("cantidad de usuarios: "+contUsuarios);
 
 
 
