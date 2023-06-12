@@ -17,6 +17,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -268,22 +269,25 @@ public class CSVReader {
             Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
 
-            LinearProbingHashTable<HashTag, Integer> hashTagsReg = new LinearProbingHashTable<>();
+            LinearProbingHashTable<String, Integer> hashTagsReg = new LinearProbingHashTable<>();
 
             for (CSVRecord record : records) {
                 String date = record.get("date");
                 String hashtags = record.get("hashtags");
 
-                String[] hashtagsParts = hashtags.split(",");
+                String parteHashSinCorcheteIzq = hashtags.replace("[", "");
+                String parteHashSinCorcheteDer = parteHashSinCorcheteIzq.replace("]", "");
 
-                for (String parteHashtag : hashtagsParts) {
-                    String parteHashSinCorcheteIzq = parteHashtag.replace("[", "");
-                    String parteHashSinCorcheteDer = parteHashSinCorcheteIzq.replace("]", "");
-                    HashTag hashTagIndividual = new HashTag(parteHashSinCorcheteDer);
-                    if (!hashTagsReg.contains(hashTagIndividual) && date.contains(fecha)) { //en el caso que no este registrado
-                        hashTagsReg.put(hashTagIndividual, 1);
-                    } else if (hashTagsReg.contains(hashTagIndividual) && date.contains(fecha)) { //en el caso q ya este registrado
-                        hashTagsReg.put(hashTagIndividual, hashTagsReg.get(hashTagIndividual) + 1);
+                String[] hashtagsSplit = parteHashSinCorcheteDer.split(",");
+
+                if (date.contains(fecha)) {
+                    for (String parteHashtag : hashtagsSplit) {
+                        String value = parteHashtag.replaceAll("[\\s'']", "");
+                        if (!hashTagsReg.contains(value)) { //en el caso que no este registrado
+                            hashTagsReg.put(value, 1);
+                        } else if (hashTagsReg.contains(value)) { //en el caso q ya este registrado
+                            hashTagsReg.put(value, hashTagsReg.get(value) + 1);
+                        }
                     }
                 }
             }
@@ -291,9 +295,12 @@ public class CSVReader {
             int contHashtags = 0;
             String hashtag = " ";
 
-            for (Entry<HashTag, Integer> entry : hashTagsReg.getEntries()) {
-                if (entry.getValue() > contHashtags && !Objects.equals(entry.getKey().getText(), "f1")) {
-                    hashtag = entry.getKey().getText();
+            for (Entry<String, Integer> entry : hashTagsReg.getEntries()) {
+                if (entry.getValue() > contHashtags
+                        && !entry.getKey().equals("F1")
+                        && !entry.getKey().equals("f1")) {
+                    hashtag = entry.getKey();
+                    contHashtags = entry.getValue();
                 }
             }
             if (!hashtag.equals(" ")) {
@@ -301,8 +308,6 @@ public class CSVReader {
             } else {
                 System.out.println("No hay Hashtags para el día " + fecha);
             }
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
