@@ -322,7 +322,7 @@ public class CSVReader {
             MyHeap<Integer, String> cuentas = new MyHeapImpl<>("maximo");
 
             for (CSVRecord record : records) {
-                String user_name = record.get("user_name").replaceAll("\\s", "");; //nombre usuario
+                String user_name = record.get("user_name").replaceAll("\\s", ""); //nombre usuario
                 String user_favourites = record.get("user_favourites"); //cantidad de favoritos
                 Integer user_favouritesInt = 0;
                 boolean bandera = false;
@@ -368,11 +368,13 @@ public class CSVReader {
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             int count = 0;
             for (CSVRecord record : records) {
-                String tweets = record.get("text");
-                if (tweets.contains(frase)) {
+                String tweets = record.get("text").replaceAll("\\s", "");
+                String fraseValue = frase.replaceAll("\\s", "");
+                if (tweets.contains(fraseValue)) {
                     count++;
                 }
             }
+
             if (count != 0) {
                 System.out.println("Existen " + count + " tweets con la frase/palabra " + "'" +frase+ "'");
             } else {
