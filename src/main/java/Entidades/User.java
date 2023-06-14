@@ -36,7 +36,7 @@ public class User implements Comparable<User> {
         return favoritos;
     }
 
-    public User(String name, String favoritos, String verificado) {
+    public User(String name, String verificado) {
         this.name = name;
         this.verificado = verificado;
         this.favoritos = favoritos;
@@ -53,5 +53,9 @@ public class User implements Comparable<User> {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return name.equals(user.name);
+    }
+
+    public void addTweet(Tweet tempTweet) {
+        listaTweets.add(tempTweet);
     }
 }

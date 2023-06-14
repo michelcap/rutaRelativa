@@ -17,6 +17,7 @@ public class LinearProbingHashTable<K, V> implements HashTable<K, V> {
     }
 
     public List<Entry<K, V>> getEntries() {
+
         List<Entry<K, V>> entries = new ArrayList<>();
         for (Entry<K, V> entry : table) {
             if (entry != null) {

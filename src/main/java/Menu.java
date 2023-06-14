@@ -36,7 +36,7 @@ public class Menu {
                     break;
                 case 2:
                     // la función para mostrar el top de usuarios con más tweets
-                    //CSVReader.topUsuariosTweets();
+                    CSVReader.topUsuariosTweets();
                     break;
                 case 3:
                     System.out.println("Ingrese la fecha (en formato YYYY-MM-DD):");

@@ -1,8 +1,8 @@
 import Entidades.HashTag;
 import Entidades.Piloto;
-import TADs.Hash.Entry;
-import TADs.Hash.HashTable;
-import TADs.Hash.LinearProbingHashTable;
+import Entidades.Tweet;
+import Entidades.User;
+import TADs.Hash.*;
 import TADs.Heap.MyHeap;
 import TADs.Heap.MyHeapImpl;
 import TADs.Heap.NodoTreeBin;
@@ -17,9 +17,7 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class CSVReader {
     static FileManager fileManager = new FileManager();
@@ -155,65 +153,72 @@ public class CSVReader {
     }
 
 
-//    // ----------  ----------  Segunda funcion ----------  ----------
-//    public static void topUsuariosTweets() {
-//        try {
-////            Reader in = new FileReader(DATA_SET);
-////            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
-////            int contUsuarios = 0;
-////
-////            LinearProbingHashTable<User, Integer> usuariosReg = new LinearProbingHashTable<>();
-////
-////            for (CSVRecord record : records) {
-////                //recorro cada tupla y obtengo las datos q necesito
-////
-////                String column = record.get("");
-////                int column1 = Integer.parseInt(column); // id del tweet
-////
-////                String user_name = record.get("user_name"); //nombre
-////
-////                String user_verified = record.get("user_verified");
-////
-////                //creo el usuario y el tweet temporal
-////                User tempUsuario = new User(user_name,user_verified);
-//////                Tweet tempTweet = new Tweet(column1);
-////
-////
-////                if (!usuariosReg.contains(tempUsuario)){
-////                    usuariosReg.put(tempUsuario,1);
-////                    contUsuarios++;
-////                }else {
-////                    usuariosReg.put(tempUsuario, usuariosReg.get(tempUsuario) + 1);
-////                }
-////
-////
-////            }
-////
-////            Heap<User, Integer> heapPrueba = new Heap<>();
-////
-////            for (Entry<User, Integer> entry : usuariosReg.getEntries()) {
-////                User user = entry.getKey();
-////                int tweets = entry.getValue();
-////                heapPrueba.insert(user,tweets);
-////
-//////                System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " + user.getVerificado() );
-////            }
-////
-////
-////
-////            heapPrueba.heapSort();
-////            LL<User> aver = heapPrueba.inOrder();
-////
-////
-////            for (int i = 0; i < 15; i++) {   //el coso esta al reves!!!!!
-////                System.out.println(i +1 +"." + aver.get(i).getName() + "Cantidad de Tweets: " + heapPrueba.find(aver.get(i)) + " verificado: " + aver.get(i).getVerificado());
-////            }
-//////            System.out.println("cantidad de usuarios: "+contUsuarios);
-////
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    //    // ----------  ----------  Segunda funcion ----------  ----------
+    public static void topUsuariosTweets() {
+        try {
+            Reader in = new FileReader(DATA_SET);
+            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+            int contUsuarios = 0;
+
+            HashTable<User, Integer> usuariosReg = new LinearProbingHashTable<>();
+
+            for (CSVRecord record : records) {
+                //recorro cada tupla y obtengo las datos q necesito
+
+                String column = record.get("");
+                Integer id = Integer.parseInt(column); // id del tweet
+
+                String user_name = record.get("user_name"); //nombre
+
+                String user_verified = record.get("user_verified"); /// verificado
+
+                //creo el usuario y el tweet temporal
+                User tempUsuario = new User(user_name, user_verified);
+                Tweet tempTweet = new Tweet(id, user_name);
+                tempUsuario.addTweet(tempTweet);
+
+                if (!usuariosReg.contains(tempUsuario)) {
+                    usuariosReg.put(tempUsuario, 1);
+                    contUsuarios++;
+                } else {
+                    usuariosReg.put(tempUsuario, usuariosReg.get(tempUsuario) + 1);
+                }
+
+
+            }
+
+            MyHeap<Integer, User> heapPrueba = new MyHeapImpl<>("maximo");
+
+
+            for (Entry<User, Integer> entry : ((LinearProbingHashTable<User, Integer>) usuariosReg).getEntries()) {
+                User user = entry.getKey();
+                int tweets = entry.getValue();
+                heapPrueba.insert(tweets, user);
+
+//                System.out.println("Usuario: " + user.getName() + ", Cantidad de Tweets: " + tweets + ", Verificado: " + user.getVerificado() );
+            }
+
+            NodoTreeBin<Integer, User> user = new NodoTreeBin<>();
+            HashTable<String, Integer> usuariosYaRecorrido = new LinearProbingHashTable<>();
+            // devuelvo el usuario y sus favoritos
+            int i = 1;
+            while (i <= 15) {
+                user = heapPrueba.delete();
+                User user_name = user.getData(); // nombre usuario
+                Integer tweets = user.getKey(); //cantidad de favoritos
+                if (!usuariosYaRecorrido.contains(user_name.getName())) {
+                    usuariosYaRecorrido.put(user_name.getName(), 0);
+                    System.out.println(i + ") " + user_name + " " + tweets);
+                    ++i;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     // ----------  ----------  Tercera funcion ----------  ----------
     public static void hashtagDistintos(String fecha) {
@@ -274,14 +279,16 @@ public class CSVReader {
             for (CSVRecord record : records) {
                 String date = record.get("date");
                 String hashtags = record.get("hashtags");
-
+                // limpia la data eliminando corchetes
                 String parteHashSinCorcheteIzq = hashtags.replace("[", "");
                 String parteHashSinCorcheteDer = parteHashSinCorcheteIzq.replace("]", "");
-
+                // independisa los hashtags de la lista del dataset
                 String[] hashtagsSplit = parteHashSinCorcheteDer.split(",");
 
+                // chequea la fecha
                 if (date.contains(fecha)) {
                     for (String parteHashtag : hashtagsSplit) {
+                        // elimina espacios y comillas para procesar y chequear los hashtagas
                         String value = parteHashtag.replaceAll("[\\s'']", "");
                         if (!hashTagsReg.contains(value)) { //en el caso que no este registrado
                             hashTagsReg.put(value, 1);
@@ -296,6 +303,7 @@ public class CSVReader {
             String hashtag = " ";
 
             for (Entry<String, Integer> entry : hashTagsReg.getEntries()) {
+                // controla en quedarce con aquel hashtag queaparece con mayor frecuencia y que nosea F1 o f1
                 if (entry.getValue() > contHashtags
                         && !entry.getKey().equals("F1")
                         && !entry.getKey().equals("f1")) {
@@ -303,6 +311,8 @@ public class CSVReader {
                     contHashtags = entry.getValue();
                 }
             }
+            // imprime por salida estandar el hashtag de mas aparece para la fecha ingresada
+            //en caso que no exista alguno para la fecha ingresada se advierte que no hay Hashtag para ese dia
             if (!hashtag.equals(" ")) {
                 System.out.println("Hashtags más usado el " + fecha + ": " + hashtag);
             } else {
@@ -322,10 +332,13 @@ public class CSVReader {
             MyHeap<Integer, String> cuentas = new MyHeapImpl<>("maximo");
 
             for (CSVRecord record : records) {
+                // limpia los espacios y recolecta nombre y favoritos
                 String user_name = record.get("user_name").replaceAll("\\s", ""); //nombre usuario
                 String user_favourites = record.get("user_favourites"); //cantidad de favoritos
                 Integer user_favouritesInt = 0;
+
                 boolean bandera = false;
+                // limpia los datos de la columna favoritos y los lleva a valores puros Integer
                 if (user_favourites.contains(".") && !user_favourites.contains("-") && !user_favourites.contains(":")) {
                     double doubleValue = Double.parseDouble(user_favourites);
                     user_favouritesInt = (int) doubleValue;
@@ -334,11 +347,17 @@ public class CSVReader {
                     user_favouritesInt = Integer.parseInt(user_favourites);
                     bandera = true;
                 }
+                // en una estructura Heap carga los datos de cantidad de favoritos segun cada usuario
+                // se decide esta estrucura ya que implementa un MAXheap organizado desde mayor a menor
+                // usuado la cantidad de favoritos como clave
                 if (bandera) {
                     cuentas.insert(user_favouritesInt, user_name);
                 }
             }
 
+            // como la estrucura Maxheap ya tiene en su nodo raiz el mayor usuario con favoritos
+            // resta ir retirando las raizes en caso que este repetido el usuario se tomara
+            // el primero ya que la estrucura MAXheap lo organizo estando primero el de mayor al momento de favoritos
             NodoTreeBin<Integer, String> user = new NodoTreeBin<>();
             HashTable<String, Integer> usuariosYaRecorrido = new LinearProbingHashTable<>();
             // devuelvo el usuario y sus favoritos
@@ -353,7 +372,6 @@ public class CSVReader {
                     ++i;
                 }
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -368,23 +386,21 @@ public class CSVReader {
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             int count = 0;
             for (CSVRecord record : records) {
+                //limpia los datos y chequea tweet a tweet la existencia de la palabra o frase solicitada
                 String tweets = record.get("text").replaceAll("\\s", "");
                 String fraseValue = frase.replaceAll("\\s", "");
                 if (tweets.contains(fraseValue)) {
                     count++;
                 }
             }
-
+            // retorna por salida estandar la frecuencia de la palabra o frase ingresada por consola
             if (count != 0) {
-                System.out.println("Existen " + count + " tweets con la frase/palabra " + "'" +frase+ "'");
+                System.out.println("Existen " + count + " tweets con la frase/palabra " + "'" + frase + "'");
             } else {
                 System.out.println("No hay tweets con la frase/palabra " + frase);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
 }
