@@ -10,7 +10,8 @@ public class Menu {
         this.scanner = new Scanner(System.in);
     }
 
-    public void start() {
+    public void start() throws Exception {
+        CSVReader.leerCSV();
 
         while (true) {
             System.out.println("Ingrese una opción:");
@@ -73,7 +74,7 @@ public class Menu {
 
 
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
         Menu elMenu = new Menu();
 
         elMenu.start();

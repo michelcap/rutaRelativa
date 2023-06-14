@@ -21,15 +21,18 @@ import java.util.List;
 
 public class CSVReader {
     static FileManager fileManager = new FileManager();
-
+    static HashTabla<Integer, String> tweets = new HashTablaImpl<>();
     private static String DATA_SET = fileManager.getFilePath_DataSet();
     private static String DRIVERS = fileManager.getFilePath_Drivers();
 
-    public static void leerCSV(String[] args) {
+    public static void leerCSV() {
+        System.out.println("Iniciando Lectura");
         try {
             Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             for (CSVRecord record : records) {
+                Integer id = Integer.parseInt(record.get(""));
+                System.out.println(id);
 //                String user_name = record.get("user_name");
 //                String user_location = record.get("user_location");
 //                String user_description = record.get("user_description");
@@ -39,14 +42,18 @@ public class CSVReader {
 //                String user_favourites = record.get("user_favourites");
 //                String user_verified = record.get("user_verified");
 //                String date = record.get("date");
-//                String text = record.get("text");
+                String text = record.get("text").replaceAll("\\s", "");
 //                String hashtags = record.get("hashtags");
 //                String source = record.get("source");
 //                String is_retweet = record.get("is_retweet");
 
+                tweets.put(id, text);
+
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -226,20 +233,17 @@ public class CSVReader {
             Reader in = new FileReader(DATA_SET);
             Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
 
-
             LinearProbingHashTable<HashTag, Integer> hashTagsReg = new LinearProbingHashTable<>();
 
             for (CSVRecord record : records) {
                 String date = record.get("date");
                 String hashtags = record.get("hashtags");
 
-
                 String[] hashtagsParts = hashtags.split(",");
 
                 for (String parteHashtag : hashtagsParts) {
                     String parteHashSinCorcheteIzq = parteHashtag.replace("[", "");
                     String parteHashSinCorcheteDer = parteHashSinCorcheteIzq.replace("]", "");
-
 
                     HashTag hashTagIndividual = new HashTag(parteHashSinCorcheteDer);
 
@@ -248,9 +252,7 @@ public class CSVReader {
                     } else if (hashTagsReg.contains(hashTagIndividual) && date.contains(fecha)) { //en el caso q ya este registrado
                         hashTagsReg.put(hashTagIndividual, hashTagsReg.get(hashTagIndividual) + 1);
                     }
-
                 }
-
             }
 
             int contHashtags = 0;
@@ -343,7 +345,7 @@ public class CSVReader {
                     double doubleValue = Double.parseDouble(user_favourites);
                     user_favouritesInt = (int) doubleValue;
                     bandera = true;
-                } else if (!user_favourites.contains("-") && !user_favourites.contains(":")){
+                } else if (!user_favourites.contains("-") && !user_favourites.contains(":")) {
                     user_favouritesInt = Integer.parseInt(user_favourites);
                     bandera = true;
                 }
@@ -362,12 +364,12 @@ public class CSVReader {
             HashTable<String, Integer> usuariosYaRecorrido = new LinearProbingHashTable<>();
             // devuelvo el usuario y sus favoritos
             int i = 1;
-            while(i<=7) {
+            while (i <= 7) {
                 user = cuentas.delete();
                 String user_name = user.getData(); // nombre usuario
                 Integer user_favourites = user.getKey(); //cantidad de favoritos
                 if (!usuariosYaRecorrido.contains(user_name)) {
-                    usuariosYaRecorrido.put(user_name,0);
+                    usuariosYaRecorrido.put(user_name, 0);
                     System.out.println(i + ") " + user_name + " " + user_favourites);
                     ++i;
                 }
@@ -380,16 +382,15 @@ public class CSVReader {
     }
 
     // ----------  ----------  Sexta funcion ----------  ---------- *Michel*
-    public static void tweetsFrase(String frase) {
+    public static void tweetsFrase(String frase) throws Exception {
         try {
-            Reader in = new FileReader(DATA_SET);
-            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+//            Reader in = new FileReader(DATA_SET);
+//            Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
             int count = 0;
-            for (CSVRecord record : records) {
+            String fraseValue = frase.replaceAll("\\s", "");
+            for (NodoHash<Integer, String> entry : tweets.getTabla()) {
                 //limpia los datos y chequea tweet a tweet la existencia de la palabra o frase solicitada
-                String tweets = record.get("text").replaceAll("\\s", "");
-                String fraseValue = frase.replaceAll("\\s", "");
-                if (tweets.contains(fraseValue)) {
+                if (entry != null && entry.getData().contains(fraseValue)) {
                     count++;
                 }
             }
@@ -399,8 +400,8 @@ public class CSVReader {
             } else {
                 System.out.println("No hay tweets con la frase/palabra " + frase);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new Exception("Error en metodo tweetsFrase");
         }
     }
 }
